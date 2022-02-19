@@ -1,8 +1,8 @@
-package datesimilarity.impl;
+package similaritymetric.datesimilarity.impl;
 
-import datesimilarity.DateSimilarityMetric;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import similaritymetric.datesimilarity.DateSimilarityMetric;
 
 public class ThresholdBasedDateTimeSimilarityMetric implements DateSimilarityMetric {
 

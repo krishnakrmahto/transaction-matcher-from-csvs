@@ -1,17 +1,27 @@
-import java.util.List;
-import org.apache.commons.csv.CSVRecord;
-import util.CSVHelper;
+import request.ReconciliationRequest;
+import service.FileReconciliationService;
+import service.ReconciliationAggregate;
+import service.ReconciliationService;
+import similaritymetric.DateSimilarityMetricStrategy;
+import similaritymetric.NumberSimilarityMetricStrategy;
+import similaritymetric.TextSimilarityMetricStrategy;
 
 public class FileReconciliationApplication {
 
   public static void main(String[] args) {
 
-    List<CSVRecord> firstFile = CSVHelper.readCsvStream(args[0]);
-    List<CSVRecord> secondFile = CSVHelper.readCsvStream(args[1]);
+    String firstFileName = args[0];
+    String secondFileName = args[1];
 
-    FileReconciliationService reconciliationService = new FileReconciliationService(firstFile, secondFile);
+//    List<CSVRecord> firstFile = CsvRepository.readCsvRecords(args[0]);
+//    List<CSVRecord> secondFile = CsvRepository.readCsvRecords(args[1]);
 
-    ReconciliationAggregate reconciliationAggregate = reconciliationService.reconcile();
+    ReconciliationRequest request = new ReconciliationRequest(DateSimilarityMetricStrategy.THRESHOLD_BASED, NumberSimilarityMetricStrategy.THRESHOLD_BASED,
+        TextSimilarityMetricStrategy.LEVENSHTEIN_DISTANCE);
+
+    ReconciliationService reconciliationService = new FileReconciliationService();
+
+    ReconciliationAggregate reconciliationAggregate = reconciliationService.reconcile(request);
   }
 
 }

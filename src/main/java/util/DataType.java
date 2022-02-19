@@ -1,3 +1,5 @@
+package util;
+
 public class DataType {
 
   private final String name;
