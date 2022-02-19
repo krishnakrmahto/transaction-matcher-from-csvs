@@ -7,6 +7,6 @@ public class LevenshteinDistanceTextSimilarity implements TextSimilarityMetric {
 
   @Override
   public double compute(String firstText, String secondText) {
-    return LevenshteinDistance.getDefaultInstance().apply(firstText, secondText);
+    return firstText.equals(secondText)? 0: LevenshteinDistance.getDefaultInstance().apply(firstText, secondText);
   }
 }
