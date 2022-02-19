@@ -21,9 +21,6 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
 
   private final CsvRepository repository;
 
-  private List<CSVRecord> firstFileRecords;
-  private List<CSVRecord> secondFileRecords;
-
   public CsvFileReconciliationService(CsvRepository repository) {
     this.repository = repository;
   }

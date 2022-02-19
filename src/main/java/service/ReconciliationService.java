@@ -37,12 +37,6 @@ public abstract class ReconciliationService<T> {
   protected abstract ReconciliationAggregate<T> process(List<T> firstReconciliationEntityList,
       List<T> secondReconciliationEntityList);
 
-  private void removeMatchesFromEntityLists(List<T> firstReconciliationEntityList,
-      List<T> secondReconciliationEntityList, List<T> exactMatches) {
-    firstReconciliationEntityList.removeAll(exactMatches);
-    secondReconciliationEntityList.removeAll(exactMatches);
-  }
-
   private void initializeSimilarityMetrics(ReconciliationRequest request) {
     dateSimilarityMetric = SimilarityMetricFactory.getDateSimilarityMetric(request);
     numberSimilarityMetric = SimilarityMetricFactory.getNumberSimilarityMetric(request);
