@@ -1,18 +1,23 @@
 package request;
 
+import service.ReconciliationEntityReferences;
 import similaritymetric.DateSimilarityMetricStrategy;
 import similaritymetric.NumberSimilarityMetricStrategy;
 import similaritymetric.TextSimilarityMetricStrategy;
 
 public class ReconciliationRequest {
 
-  private DateSimilarityMetricStrategy dateSimilarityMetricStrategy;
-  private NumberSimilarityMetricStrategy numberSimilarityMetricStrategy;
-  private TextSimilarityMetricStrategy textSimilarityMetricStrategy;
+  private final ReconciliationEntityReferences entityReferences;
 
-  public ReconciliationRequest(DateSimilarityMetricStrategy dateSimilarityMetricStrategy,
+  private final DateSimilarityMetricStrategy dateSimilarityMetricStrategy;
+  private final NumberSimilarityMetricStrategy numberSimilarityMetricStrategy;
+  private final TextSimilarityMetricStrategy textSimilarityMetricStrategy;
+
+  public ReconciliationRequest(ReconciliationEntityReferences entityReferences,
+      DateSimilarityMetricStrategy dateSimilarityMetricStrategy,
       NumberSimilarityMetricStrategy numberSimilarityMetricStrategy,
       TextSimilarityMetricStrategy textSimilarityMetricStrategy) {
+    this.entityReferences = entityReferences;
     this.dateSimilarityMetricStrategy = dateSimilarityMetricStrategy;
     this.numberSimilarityMetricStrategy = numberSimilarityMetricStrategy;
     this.textSimilarityMetricStrategy = textSimilarityMetricStrategy;
@@ -28,5 +33,9 @@ public class ReconciliationRequest {
 
   public TextSimilarityMetricStrategy getTextSimilarityMetricStrategy() {
     return textSimilarityMetricStrategy;
+  }
+
+  public ReconciliationEntityReferences getEntityReferences() {
+    return entityReferences;
   }
 }

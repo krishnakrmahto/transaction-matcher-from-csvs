@@ -1,4 +1,4 @@
-package util;
+package repository;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.csv.CSVFormat.Builder;
 import org.apache.commons.csv.CSVRecord;
 
-public class CSVHelper {
+public class CsvRepository implements Repository{
 
-  public static List<CSVRecord> readCsvStream(String fileName) {
+  public List<CSVRecord> readCsvRecords(String fileName) {
 
     try {
       Reader fileReader = new FileReader(fileName);
