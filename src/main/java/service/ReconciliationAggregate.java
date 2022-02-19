@@ -1,14 +1,22 @@
 package service;
 
+import java.util.List;
+
 public interface ReconciliationAggregate<T> {
 
-//  private List<CSVRecord> exactMatches;
-//  private List<CSVRecord> partialMatches;
-//  private List<CSVRecord> onlyInBuyer;
-//  private List<CSVRecord> onlyInSupplier;
+  void putSingleExactMatch(T exactMatch);
 
-  void putExactMatch(T exactMatch);
-  void fillPartialMatches(T partialMatch);
-  void fillOnlyInBuyer(T onlyInBuyer);
-  void fillOnlyInSupplier(T onlyInSupplier);
+  void putExactMatches(List<T> exactMatches);
+
+  void putSinglePartialMatch(T partialMatch);
+
+  void fillPartialMatches(List<T> partialMatch);
+
+  void putSingleOnlyInBuyer(T onlyInBuyer);
+
+  void fillOnlyInBuyerList(List<T> onlyInBuyerList);
+
+  void fillOnlyInSupplierList(List<T> onlyInSupplier);
+
+  List<T> getExactMatches();
 }

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import request.ReconciliationRequest;
 import similaritymetric.SimilarityMetricFactory;
 import similaritymetric.datesimilarity.DateSimilarityMetric;
@@ -11,8 +12,6 @@ import similaritymetric.numbersimilarity.NumberSimilarityMetric;
 import similaritymetric.textsimilarity.TextSimilarityMetric;
 
 public abstract class ReconciliationService<T> {
-
-  protected ReconciliationEntityReferences entityReferences;
 
   protected DateSimilarityMetric dateSimilarityMetric;
   protected NumberSimilarityMetric numberSimilarityMetric;
@@ -22,20 +21,32 @@ public abstract class ReconciliationService<T> {
 
   public final ReconciliationAggregate<T> reconcile(ReconciliationRequest request) {
     initializeSimilarityMetrics(request);
-//    initializeReconciliationEntities(request);
-    ReconciliationAggregate<T> reconciliationAggregate = initReconciliationAggregateWithExactMatches();
+    List<T> firstReconciliationEntityList = getFirstReconciliationEntityList(request);
+    List<T> secondReconciliationEntityList = getSecondReconciliationEntityList(request);
 
-    return null;
+    populateDataTypeSequence(firstReconciliationEntityList.get(0));
+
+    return process(firstReconciliationEntityList, secondReconciliationEntityList);
+  }
+
+  protected abstract List<T> getFirstReconciliationEntityList(ReconciliationRequest request);
+
+  protected abstract List<T> getSecondReconciliationEntityList(
+      ReconciliationRequest request);
+
+  protected abstract ReconciliationAggregate<T> process(List<T> firstReconciliationEntityList,
+      List<T> secondReconciliationEntityList);
+
+  private void removeMatchesFromEntityLists(List<T> firstReconciliationEntityList,
+      List<T> secondReconciliationEntityList, List<T> exactMatches) {
+    firstReconciliationEntityList.removeAll(exactMatches);
+    secondReconciliationEntityList.removeAll(exactMatches);
   }
 
   private void initializeSimilarityMetrics(ReconciliationRequest request) {
-    entityReferences = request.getEntityReferences();
-    dateSimilarityMetric = SimilarityMetricFactory.getDateSimilarityMetric(
-        request.getDateSimilarityMetricStrategy());
-    numberSimilarityMetric = SimilarityMetricFactory.getNumberSimilarityMetric(
-        request.getNumberSimilarityMetricStrategy());
-    textSimilarityMetric = SimilarityMetricFactory.getTextSimilarityMetric(
-        request.getTextSimilarityMetricStrategy());
+    dateSimilarityMetric = SimilarityMetricFactory.getDateSimilarityMetric(request);
+    numberSimilarityMetric = SimilarityMetricFactory.getNumberSimilarityMetric(request);
+    textSimilarityMetric = SimilarityMetricFactory.getTextSimilarityMetric(request);
   }
 
   protected boolean isValueDate(String value) {
@@ -57,13 +68,16 @@ public abstract class ReconciliationService<T> {
     }
   }
 
+  protected boolean isSimilarityVectorAZeroVector(List<Double> similarityVector) {
+    return similarityVector.stream().noneMatch(elem -> elem != 0);
+  }
+
+  protected boolean isSimilarityVectorInfiniteVector(List<Double> similarityVector) {
+    return similarityVector.stream().anyMatch(elem -> elem.equals(Double.MAX_VALUE));
+  }
+
+  protected abstract int getClosestSecondEntityRecordIndex(Map<Integer, List<Double>> secondFileIndexToSimilarityVectorMap);
+
   protected abstract void populateDataTypeSequence(T singleReconciliationEntity);
 
-//  protected abstract void initializeReconciliationEntities(ReconciliationRequest request);
-
-  protected abstract ReconciliationAggregate<T> initReconciliationAggregateWithExactMatches();
-
-//  protected abstract void fillAggregateWithPartialMatches(ReconciliationAggregate<T> reconciliationAggregate);
-
-//  protected abstract void fillAggregateOnlyInBuyer(Recon)
 }
