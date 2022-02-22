@@ -1,67 +1,50 @@
 package service.aggregate.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
 import service.aggregate.ReconciliationAggregate;
 
 public class CsvReconciliationAggregate implements ReconciliationAggregate<CSVRecord> {
 
-  private List<CSVRecord> exactMatches;
-  private List<CSVRecord> partialMatches ;
-  private List<CSVRecord> onlyInBuyerList;
-  private List<CSVRecord> onlyInSupplierList;
+  private List<CsvRecordMatches> exactMatches;
+  private List<CsvRecordMatches> partialMatches ;
+  private List<CSVRecord> onlyInFirstFileList;
+  private List<CSVRecord> onlyInSecondFileList;
 
 
   @Override
-  public void putSingleExactMatch(CSVRecord exactMatch) {
-    this.exactMatches.add(exactMatch);
+  public void putSingleExactMatch(CSVRecord firstRecord, CSVRecord secondRecord) {
+    this.exactMatches.add(new CsvRecordMatches(firstRecord, secondRecord));
   }
 
   @Override
-  public void putExactMatches(List<CSVRecord> exactMatches) {
-    this.exactMatches = new ArrayList<>(exactMatches);
+  public void putSinglePartialMatch(CSVRecord firstRecord, CSVRecord secondRecord) {
+    this.partialMatches.add(new CsvRecordMatches(firstRecord, secondRecord));
   }
 
   @Override
-  public void putSinglePartialMatch(CSVRecord partialMatch) {
-    this.partialMatches.add(partialMatch);
+  public void putSingleOnlyInFirstFile(CSVRecord onlyInFirstFile) {
+    this.onlyInFirstFileList.add(onlyInFirstFile);
   }
 
   @Override
-  public void fillPartialMatches(List<CSVRecord> partialMatches) {
-    this.partialMatches = new ArrayList<>(partialMatches);
+  public void putSingleOnlyInSecondFile(CSVRecord onlyInSecondFile) {
+    this.onlyInFirstFileList.add(onlyInSecondFile);
   }
 
-  @Override
-  public void putSingleOnlyInBuyer(CSVRecord onlyInBuyer) {
-    this.onlyInBuyerList.add(onlyInBuyer);
-  }
-
-  @Override
-  public void fillOnlyInBuyerList(List<CSVRecord> onlyInBuyerList) {
-    this.onlyInBuyerList = new ArrayList<>(onlyInBuyerList);
-  }
-
-  @Override
-  public void fillOnlyInSupplierList(List<CSVRecord> onlyInSupplierList) {
-    this.onlyInSupplierList = new ArrayList<>(onlyInSupplierList);
-  }
-
-  @Override
-  public List<CSVRecord> getExactMatches() {
+  public List<CsvRecordMatches> getExactMatches() {
     return exactMatches;
   }
 
-  public List<CSVRecord> getPartialMatches() {
+  public List<CsvRecordMatches> getPartialMatches() {
     return partialMatches;
   }
 
-  public List<CSVRecord> getOnlyInBuyerList() {
-    return onlyInBuyerList;
+  public List<CSVRecord> getOnlyInFirstFileList() {
+    return onlyInFirstFileList;
   }
 
-  public List<CSVRecord> getOnlyInSupplierList() {
-    return onlyInSupplierList;
+  public List<CSVRecord> getOnlyInSecondFileList() {
+    return onlyInSecondFileList;
   }
 }

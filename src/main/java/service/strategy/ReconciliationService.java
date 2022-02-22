@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.Map;
 import request.ReconciliationRequest;
 import service.SupportedValueDataTypes;
 import service.aggregate.ReconciliationAggregate;
@@ -63,16 +62,6 @@ public abstract class ReconciliationService<T> {
       return false;
     }
   }
-
-  protected boolean isSimilarityVectorAZeroVector(List<Double> similarityVector) {
-    return similarityVector.stream().noneMatch(elem -> elem != 0);
-  }
-
-  protected boolean isSimilarityVectorInfiniteVector(List<Double> similarityVector) {
-    return similarityVector.stream().anyMatch(elem -> elem.equals(Double.MAX_VALUE));
-  }
-
-  protected abstract int getClosestSecondEntityRecordIndex(Map<Integer, List<Double>> secondFileIndexToSimilarityVectorMap);
 
   protected abstract void populateDataTypeSequence(T singleReconciliationEntity);
 
