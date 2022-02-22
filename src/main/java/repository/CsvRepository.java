@@ -17,6 +17,7 @@ public class CsvRepository implements Repository<CSVRecord> {
       return Builder.create().setSkipHeaderRecord(true).build()
           .parse(fileReader)
           .stream()
+          .skip(1)
           .collect(Collectors.toList());
 
     } catch (IOException e) {

@@ -5,7 +5,9 @@ import static service.SupportedValueDataTypes.NUMBER;
 import static service.SupportedValueDataTypes.TEXT;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,13 +18,13 @@ import request.ReconciliationRequest;
 import service.SupportedValueDataTypes;
 import service.aggregate.ReconciliationAggregate;
 import service.aggregate.impl.CsvReconciliationAggregate;
-import service.bestpartialmatch.impl.SimilarityIndexSumBasedBestPartialMatcher;
+import service.bestpartialmatch.BestPartialMatchStrategy;
 import service.strategy.ReconciliationService;
 
 public class CsvFileReconciliationService extends ReconciliationService<CSVRecord> {
 
   private final CsvRepository repository;
-  private SimilarityIndexSumBasedBestPartialMatcher bestPartialMatcher;
+  private BestPartialMatchStrategy<List<Double>> bestPartialMatcher;
 
   public CsvFileReconciliationService(CsvRepository repository) {
     this.repository = repository;
@@ -30,7 +32,7 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
 
   @Override
   protected void populateDataTypeSequence(CSVRecord singleCsvRecord) {
-    singleCsvRecord.stream()
+    singleCsvRecord.toList().stream()
         .map(value -> {
           if (isValueDate(value)) {
             return DATETIME;
@@ -43,8 +45,7 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
   }
 
   @Override
-  protected ReconciliationAggregate<CSVRecord> process(List<CSVRecord> firstFileCsvRecords,
-      List<CSVRecord> secondFileCsvRecords) {
+  protected ReconciliationAggregate<CSVRecord> process(List<CSVRecord> firstFileCsvRecords, List<CSVRecord> secondFileCsvRecords) {
 
     int firstFileIteratorIndex = 0;
     int secondFileIteratorIndex = 0;
@@ -107,7 +108,14 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
   }
 
   private int getBestPartialMatchRecordIndex(Map<Integer, List<Double>> secondFileIndexToSimilarityVectorMap) {
-    return 0;
+
+    LinkedHashMap<Integer, List<Double>> orderedIndexToSimilarityVectorMap = new LinkedHashMap<>(secondFileIndexToSimilarityVectorMap);
+
+    List<List<Double>> partialMatchSimilarityVectors = new ArrayList<>(orderedIndexToSimilarityVectorMap.values());
+    List<Integer> similarityIndexPositions = new ArrayList<>(secondFileIndexToSimilarityVectorMap.keySet());
+
+    return similarityIndexPositions.get(bestPartialMatcher.getBestPartialMatchIndex(partialMatchSimilarityVectors));
+
   }
 
   private boolean areAllSimilarityIndexOneIn(List<Double> similarityIndexVector) {
