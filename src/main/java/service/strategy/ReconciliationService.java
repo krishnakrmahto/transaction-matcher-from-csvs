@@ -1,4 +1,4 @@
-package service;
+package service.strategy;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -6,6 +6,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import request.ReconciliationRequest;
+import service.SupportedValueDataTypes;
+import service.aggregate.ReconciliationAggregate;
 import similaritymetric.SimilarityMetricFactory;
 import similaritymetric.datesimilarity.DateSimilarityMetric;
 import similaritymetric.numbersimilarity.NumberSimilarityMetric;
