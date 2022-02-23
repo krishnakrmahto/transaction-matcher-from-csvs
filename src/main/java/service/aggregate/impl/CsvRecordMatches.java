@@ -11,4 +11,8 @@ public class CsvRecordMatches {
     this.firstRecord = firstRecord;
     this.secondRecord = secondRecord;
   }
+
+  public CSVRecord getFirstRecord() {
+    return firstRecord;
+  }
 }

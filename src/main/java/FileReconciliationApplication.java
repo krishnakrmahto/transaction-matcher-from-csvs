@@ -30,6 +30,8 @@ public class FileReconciliationApplication {
     ReconciliationService reconciliationService = ReconciliationServiceFactory.get(ReconciliationServiceStrategy.CSV_FILE);
 
     ReconciliationAggregate reconciliationAggregate = reconciliationService.reconcile(request);
+
+    System.out.println(reconciliationAggregate);
   }
 
 }
