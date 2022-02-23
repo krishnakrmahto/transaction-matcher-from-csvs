@@ -3,6 +3,7 @@ package service.strategy;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import request.ReconciliationRequest;
 import service.SupportedValueDataTypes;
@@ -18,14 +19,14 @@ public abstract class ReconciliationService<T> {
   protected NumberSimilarityMetric numberSimilarityMetric;
   protected TextSimilarityMetric textSimilarityMetric;
 
-  protected List<SupportedValueDataTypes> dataTypeSequence;
+  protected List<SupportedValueDataTypes> dataTypeSequence = new ArrayList<>();
 
   public final ReconciliationAggregate<T> reconcile(ReconciliationRequest request) {
     initializeSimilarityMetrics(request);
     List<T> firstReconciliationEntityList = getFirstReconciliationEntityList(request);
     List<T> secondReconciliationEntityList = getSecondReconciliationEntityList(request);
 
-    populateDataTypeSequence(firstReconciliationEntityList.get(0));
+    populateDataTypeSequence(firstReconciliationEntityList, secondReconciliationEntityList);
 
     return process(firstReconciliationEntityList, secondReconciliationEntityList);
   }
@@ -63,6 +64,6 @@ public abstract class ReconciliationService<T> {
     }
   }
 
-  protected abstract void populateDataTypeSequence(T singleReconciliationEntity);
+  protected abstract void populateDataTypeSequence(List<T> firstReconciliationEntity, List<T> secondReconciliationEntity);
 
 }

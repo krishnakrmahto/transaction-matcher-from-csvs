@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import org.apache.commons.csv.CSVRecord;
 import repository.CsvRepository;
 import request.ReconciliationRequest;
@@ -31,17 +32,36 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
   }
 
   @Override
-  protected void populateDataTypeSequence(CSVRecord singleCsvRecord) {
-    singleCsvRecord.toList().stream()
-        .map(value -> {
+  protected void populateDataTypeSequence(List<CSVRecord> firstFileCsvRecords, List<CSVRecord> secondFileCsvRecord) {
+
+    List<CSVRecord> allCsvRecords = Stream.concat(firstFileCsvRecords.stream(), secondFileCsvRecord.stream())
+            .collect(Collectors.toList());
+
+    int numberOfColumns = firstFileCsvRecords.get(0).size();
+
+    for(int i = 0; i < numberOfColumns; i++) {
+      boolean foundNonEmptyValue = false;
+      for (CSVRecord csvRecord : allCsvRecords) {
+        String value = csvRecord.get(i);
+        if (!value.isBlank()) {
+          foundNonEmptyValue = true;
           if (isValueDate(value)) {
-            return DATETIME;
+            dataTypeSequence.add(DATETIME);
+            break;
           } else if (isValueNumber(value)) {
-            return NUMBER;
+            dataTypeSequence.add(NUMBER);
+            break;
+          } else {
+            dataTypeSequence.add(TEXT);
+            break;
           }
-          return TEXT;
-        })
-        .forEach(dataTypeSequence::add);
+        }
+      }
+
+      if (!foundNonEmptyValue) {
+        dataTypeSequence.add(TEXT);
+      }
+    }
   }
 
   @Override
