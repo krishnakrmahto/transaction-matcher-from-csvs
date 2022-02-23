@@ -4,7 +4,7 @@ import static service.SupportedValueDataTypes.DATETIME;
 import static service.SupportedValueDataTypes.NUMBER;
 import static service.SupportedValueDataTypes.TEXT;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -20,12 +20,13 @@ import service.SupportedValueDataTypes;
 import service.aggregate.ReconciliationAggregate;
 import service.aggregate.impl.CsvReconciliationAggregate;
 import service.bestpartialmatch.BestPartialMatchStrategy;
+import service.bestpartialmatch.impl.SimilarityIndexSumBasedBestPartialMatcher;
 import service.strategy.ReconciliationService;
 
 public class CsvFileReconciliationService extends ReconciliationService<CSVRecord> {
 
   private final CsvRepository repository;
-  private BestPartialMatchStrategy<List<Double>> bestPartialMatcher;
+  private final BestPartialMatchStrategy<List<Double>> bestPartialMatcher = new SimilarityIndexSumBasedBestPartialMatcher();
 
   public CsvFileReconciliationService(CsvRepository repository) {
     this.repository = repository;
@@ -85,9 +86,9 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
             .map(i -> {
               SupportedValueDataTypes currentDataType = dataTypeSequence.get(i);
               if (currentDataType.equals(DATETIME)) {
-                LocalDateTime firstDateTime = LocalDateTime.parse(firstFileCsvRecord.get(i));
-                LocalDateTime secondDateTime = LocalDateTime.parse(secondFileCsvRecord.get(i));
-                return dateSimilarityMetric.compute(firstDateTime, secondDateTime);
+                LocalDate firstDate = LocalDate.parse(firstFileCsvRecord.get(i));
+                LocalDate secondDate = LocalDate.parse(secondFileCsvRecord.get(i));
+                return dateSimilarityMetric.compute(firstDate, secondDate);
               } else if (currentDataType.equals(NUMBER)) {
                 double firstNumber = Double.parseDouble(firstFileCsvRecord.get(i));
                 double secondNumber = Double.parseDouble(secondFileCsvRecord.get(i));
