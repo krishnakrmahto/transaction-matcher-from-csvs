@@ -1,15 +1,16 @@
 package service.aggregate.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
 import service.aggregate.ReconciliationAggregate;
 
 public class CsvReconciliationAggregate implements ReconciliationAggregate<CSVRecord> {
 
-  private List<CsvRecordMatches> exactMatches;
-  private List<CsvRecordMatches> partialMatches ;
-  private List<CSVRecord> onlyInFirstFileList;
-  private List<CSVRecord> onlyInSecondFileList;
+  private List<CsvRecordMatches> exactMatches = new ArrayList<>();
+  private List<CsvRecordMatches> partialMatches = new ArrayList<>();
+  private List<CSVRecord> onlyInFirstFileList = new ArrayList<>();
+  private List<CSVRecord> onlyInSecondFileList = new ArrayList<>();
 
 
   @Override

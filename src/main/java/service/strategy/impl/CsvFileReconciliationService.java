@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -78,6 +79,8 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
       Map<Integer, List<Double>> secondFileIndexToSimilarityVectorMap = new HashMap<>();
 
       List<Double> similarityVector;
+      boolean foundExactMatch = false;
+      boolean onlyInFirstFile = false;
       while (secondFileIteratorIndex < secondFileCsvRecords.size()) {
         CSVRecord secondFileCsvRecord = secondFileCsvRecords.get(secondFileIteratorIndex);
 
@@ -85,37 +88,98 @@ public class CsvFileReconciliationService extends ReconciliationService<CSVRecor
             .boxed()
             .map(i -> {
               SupportedValueDataTypes currentDataType = dataTypeSequence.get(i);
+              String firstFileColumnValue = firstFileCsvRecord.get(i);
+              String secondFileColumnValue = secondFileCsvRecord.get(i);
               if (currentDataType.equals(DATETIME)) {
-                LocalDate firstDate = LocalDate.parse(firstFileCsvRecord.get(i));
-                LocalDate secondDate = LocalDate.parse(secondFileCsvRecord.get(i));
-                return dateSimilarityMetric.compute(firstDate, secondDate);
+                return getDateSimilarityMetricIndex(firstFileColumnValue, secondFileColumnValue);
               } else if (currentDataType.equals(NUMBER)) {
-                double firstNumber = Double.parseDouble(firstFileCsvRecord.get(i));
-                double secondNumber = Double.parseDouble(secondFileCsvRecord.get(i));
-                return numberSimilarityMetric.compute(firstNumber, secondNumber);
+                return getNumberSimilarityMetricIndex(firstFileColumnValue, secondFileColumnValue);
               } else {
-                return textSimilarityMetric.compute(firstFileCsvRecord.get(i),
-                    secondFileCsvRecord.get(i));
+                return getTextSimilarityMetricIndex(firstFileColumnValue, secondFileColumnValue);
               }
             })
             .collect(Collectors.toList());
 
         if (areAllSimilarityIndexOneIn(similarityVector)) {
+          foundExactMatch = true;
           reconciliationAggregate.putSingleExactMatch(firstFileCsvRecord, secondFileCsvRecord);
           break;
         } else if (isAtleastOneSimilarityIndexZeroIn(similarityVector)) {
+          onlyInFirstFile = true;
           reconciliationAggregate.putSingleOnlyInFirstFile(firstFileCsvRecord);
           break;
         } else {
           secondFileIndexToSimilarityVectorMap.put(secondFileIteratorIndex, similarityVector);
+          secondFileIteratorIndex++;
         }
       }
 
-      int bestPartialMatchIndex = getBestPartialMatchRecordIndex(secondFileIndexToSimilarityVectorMap);
-      reconciliationAggregate.putSinglePartialMatch(firstFileCsvRecord, secondFileCsvRecords.get(bestPartialMatchIndex));
+      if (!foundExactMatch && !onlyInFirstFile) {
+        int bestPartialMatchIndex = getBestPartialMatchRecordIndex(secondFileIndexToSimilarityVectorMap);
+        reconciliationAggregate.putSinglePartialMatch(firstFileCsvRecord, secondFileCsvRecords.get(bestPartialMatchIndex));
+      }
+
+      firstFileIteratorIndex++;
     }
 
       return reconciliationAggregate;
+  }
+
+  private double getTextSimilarityMetricIndex(String firstFileColumnValue, String secondFileColumnValue) {
+
+    Optional<Double> blankBasedSimilarityIndex = computeBlankBasedSimilarityIndex(firstFileColumnValue,
+        secondFileColumnValue);
+
+    if (blankBasedSimilarityIndex.isEmpty()) {
+      return textSimilarityMetric.compute(firstFileColumnValue, secondFileColumnValue);
+    }
+
+    return blankBasedSimilarityIndex.get();
+  }
+
+  private double getNumberSimilarityMetricIndex(String firstFileColumnValue, String secondFileColumnValue) {
+
+    Optional<Double> blankBasedSimilarityIndex = computeBlankBasedSimilarityIndex(firstFileColumnValue,
+        secondFileColumnValue);
+
+    if (blankBasedSimilarityIndex.isEmpty()) {
+      double firstNumber = Double.parseDouble(firstFileColumnValue);
+      double secondNumber = Double.parseDouble(secondFileColumnValue);
+
+      return numberSimilarityMetric.compute(firstNumber, secondNumber);
+    }
+
+    return blankBasedSimilarityIndex.get();
+  }
+
+  private double getDateSimilarityMetricIndex(String firstFileColumnValue, String secondFileColumnValue) {
+
+    Optional<Double> blankBasedSimilarityIndex = computeBlankBasedSimilarityIndex(firstFileColumnValue,
+        secondFileColumnValue);
+
+    if (blankBasedSimilarityIndex.isEmpty()) {
+      LocalDate firstDate = LocalDate.parse(firstFileColumnValue);
+      LocalDate secondDate = LocalDate.parse(secondFileColumnValue);
+      return dateSimilarityMetric.compute(firstDate, secondDate);
+    }
+
+    return blankBasedSimilarityIndex.get();
+  }
+
+  private Optional<Double> computeBlankBasedSimilarityIndex(String firstFileColumnValue, String secondFileColumnValue) {
+
+    boolean isFirstFileColumnValueBlank = firstFileColumnValue.isBlank();
+    boolean isSecondFileColumnValueBlank = secondFileColumnValue.isBlank();
+
+    if (isFirstFileColumnValueBlank && isSecondFileColumnValueBlank) {
+      return Optional.of(1.0);
+    } else if (isFirstFileColumnValueBlank) {
+      return Optional.of(0.0);
+    } else if (isSecondFileColumnValueBlank) {
+      return Optional.of(0.0);
+    }
+
+    return Optional.empty();
   }
 
   @Override
