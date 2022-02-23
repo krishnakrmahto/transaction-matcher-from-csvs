@@ -17,9 +17,9 @@ public class ThresholdBasedNumberSimilarityMetric implements NumberSimilarityMet
       return 1;
     }
 
+    double smallerNumber = Math.min(firstNumber, secondNumber);
     double largerNumber = Math.max(firstNumber, secondNumber);
-    double firstNumberSecondNumberDiff = Math.abs(firstNumber - secondNumber);
-    double similarityIndex = (largerNumber-firstNumberSecondNumberDiff)/largerNumber;
+    double similarityIndex = smallerNumber/largerNumber;
 
     return similarityIndex <= threshold? similarityIndex: 0;
   }

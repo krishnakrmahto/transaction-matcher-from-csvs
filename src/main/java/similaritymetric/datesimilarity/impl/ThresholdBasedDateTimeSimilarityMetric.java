@@ -2,7 +2,6 @@ package similaritymetric.datesimilarity.impl;
 
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.time.temporal.ChronoUnit;
 import similaritymetric.datesimilarity.DateSimilarityMetric;
 
 public class ThresholdBasedDateTimeSimilarityMetric implements DateSimilarityMetric {
@@ -23,9 +22,11 @@ public class ThresholdBasedDateTimeSimilarityMetric implements DateSimilarityMet
     long firstDateEpoch = firstDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
     long secondDateEpoch = secondDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC);
 
+
+    long smallerDateTimeEpoch = Math.min(firstDateEpoch, secondDateEpoch);
     long largerDateTimeEpoch = Math.max(firstDateEpoch, secondDateEpoch);
-    long epochDifference = Math.abs(ChronoUnit.SECONDS.between(firstDate, secondDate));
-    double similarityIndex = (largerDateTimeEpoch - epochDifference)/(double) largerDateTimeEpoch;
+
+    double similarityIndex = (double) smallerDateTimeEpoch/largerDateTimeEpoch ;
 
     return similarityIndex <= threshold? similarityIndex: 0;
   }
