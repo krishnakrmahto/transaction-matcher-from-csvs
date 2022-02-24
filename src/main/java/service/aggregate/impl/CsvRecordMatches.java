@@ -2,17 +2,9 @@ package service.aggregate.impl;
 
 import org.apache.commons.csv.CSVRecord;
 
-public class CsvRecordMatches {
-
-  private CSVRecord firstRecord;
-  private CSVRecord secondRecord;
+public class CsvRecordMatches extends RecordMatches<CSVRecord>{
 
   public CsvRecordMatches(CSVRecord firstRecord, CSVRecord secondRecord) {
-    this.firstRecord = firstRecord;
-    this.secondRecord = secondRecord;
-  }
-
-  public CSVRecord getFirstRecord() {
-    return firstRecord;
+    super(firstRecord, secondRecord);
   }
 }
