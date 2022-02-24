@@ -10,12 +10,13 @@ import java.util.Optional;
 import request.ReconciliationRequest;
 import service.SupportedValueDataTypes;
 import service.aggregate.ReconciliationAggregate;
+import service.aggregate.impl.RecordMatches;
 import similaritymetric.SimilarityMetricFactory;
 import similaritymetric.datesimilarity.DateSimilarityMetric;
 import similaritymetric.numbersimilarity.NumberSimilarityMetric;
 import similaritymetric.textsimilarity.TextSimilarityMetric;
 
-public abstract class ReconciliationService<T> {
+public abstract class ReconciliationService<T, V extends RecordMatches<T>> {
 
   protected DateSimilarityMetric dateSimilarityMetric;
   protected NumberSimilarityMetric numberSimilarityMetric;
@@ -23,7 +24,7 @@ public abstract class ReconciliationService<T> {
 
   protected List<SupportedValueDataTypes> dataTypeSequence = new ArrayList<>();
 
-  public final ReconciliationAggregate<T> reconcile(ReconciliationRequest request) {
+  public final ReconciliationAggregate<T, V> reconcile(ReconciliationRequest request) {
     initializeSimilarityMetrics(request);
     List<T> firstReconciliationEntityList = getFirstReconciliationEntityList(request);
     List<T> secondReconciliationEntityList = getSecondReconciliationEntityList(request);
@@ -38,7 +39,7 @@ public abstract class ReconciliationService<T> {
   protected abstract List<T> getSecondReconciliationEntityList(
       ReconciliationRequest request);
 
-  protected abstract ReconciliationAggregate<T> process(List<T> firstReconciliationEntityList,
+  protected abstract ReconciliationAggregate<T, V> process(List<T> firstReconciliationEntityList,
       List<T> secondReconciliationEntityList);
 
   private void initializeSimilarityMetrics(ReconciliationRequest request) {

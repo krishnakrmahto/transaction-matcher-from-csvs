@@ -2,9 +2,9 @@ package service.aggregate;
 
 import java.util.List;
 import org.apache.commons.csv.CSVRecord;
-import service.aggregate.impl.CsvRecordMatches;
+import service.aggregate.impl.RecordMatches;
 
-public interface ReconciliationAggregate<T> {
+public interface ReconciliationAggregate<T, V extends RecordMatches<T>> {
 
   void putSingleExactMatch(T firstRecord, T secondRecord);
 
@@ -18,9 +18,9 @@ public interface ReconciliationAggregate<T> {
 
   void putSingleOnlyInSecondFile(T onlyInSecondFile);
 
-  List<CsvRecordMatches> getExactMatches();
+  List<V> getExactMatches();
 
-  List<CsvRecordMatches> getPartialMatches();
+  List<V> getPartialMatches();
 
   List<CSVRecord> getOnlyInFirstFileList();
 
